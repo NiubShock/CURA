@@ -23,8 +23,8 @@ class MCP2515 {
             uint8_t prescaler;
             bool    triple_sample_point;
 
-            // uint8_t receive_buff_option;
-            // bool    rollover_enable;
+            uint8_t receive_buff_option;
+            bool    rollover_enable;
         } t_MCP2515_Init_Param;
 
         typedef struct {

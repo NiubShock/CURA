@@ -18,8 +18,8 @@
 #define MCP_RXB_RX_MASK     0x60
 #define MCP_RXB_BUKT_MASK   (1<<2)
 
-#define MCP_RX_FLT_ANY      0x00
-#define MCP_RX_FLT_ID       0x03
+#define MCP_RX_FLT_ANY      0x03
+#define MCP_RX_FLT_ID       0x00
 
 
 // Bits in the TXBnCTRL registers.
@@ -527,8 +527,9 @@ typedef union {
 typedef union {
     struct {
         unsigned FILHIT0        : 1;
-        unsigned unsued_0       : 1;
+        unsigned unused_0       : 1;
         unsigned BUKT           : 1;
+        unsigned RXRTR          : 1;
         unsigned unused_1       : 1;
         unsigned RXM            : 2;
         unsigned unused_2       : 1;

@@ -82,10 +82,13 @@ bool MCP2515 :: checkRXBuffer(uint8_t *ptr_array){
     RXB0DLC.w = read_register(MCP_RXB0DLC);
 
     if (CANINTF.b.RX0IF > 0){
-        SERIAL_PORT_MONITOR.print(CANINTF.b.RX0IF, HEX);
+        SERIAL_PORT_MONITOR.print(CANINTF.w, HEX);
+        SERIAL_PORT_MONITOR.print(" ");
         SERIAL_PORT_MONITOR.print(RXB0DLC.w, HEX);
 
-        SERIAL_PORT_MONITOR.print(" ");
+        write_register(MCP_CANINTF, 0);
+
+        SERIAL_PORT_MONITOR.println(" ");
 
         for (int i = 0; i < 8; i ++){
             *(ptr_array + i) = read_register(MCP_RXB0D_START + i);
@@ -152,33 +155,46 @@ bool MCP2515 :: begin(t_MCP2515_Init_Param param, t_MCP2515_Mode mode) {
     if (!set_ok)    return false;
     /* ----------------------------------------------------- */
 
-    // write_register(MCP_CNF1, CNF1.w);
-    // write_register(MCP_CNF2, CNF2.w);
-    // write_register(MCP_CNF3, CNF3.w);
+    RXB0CTRL.w = 0;
+    RXB1CTRL.w = 0;
 
-    SERIAL_PORT_MONITOR.println(CNF1.w, HEX);
-    SERIAL_PORT_MONITOR.println(CNF2.w, HEX);
-    SERIAL_PORT_MONITOR.println(CNF3.w, HEX);
+    RXB0CTRL.b.BUKT = param.rollover_enable;
+    RXB0CTRL.b.RXM  = param.receive_buff_option;
+    RXB1CTRL.b.RXM  = param.receive_buff_option;
 
-    write_register(MCP_CNF1, 0x00);
-    write_register(MCP_CNF2, 0xD0);
-    write_register(MCP_CNF3, 0x82);
-
-    // data = read_register(MCP_CNF1);
-    // if (data != CNF1.w) return false;
-
-    // data = read_register(MCP_CNF2);
-    // if (data != CNF2.w) return false;
-
-    // data = read_register(MCP_CNF3);
-    // if (data != CNF3.w) return false;
-
-    // RXB0CTRL.b.BUKT = param.rollover_enable;
-    // RXB0CTRL.b.RXM  = param.receive_buff_option;
-    // RXB1CTRL.b.RXM  = param.receive_buff_option;
-
-    // write_register(MCP_RXB0CTRL, RXB0CTRL.w);
+    write_register(MCP_RXB0CTRL, RXB0CTRL.w);
     // write_register(MCP_RXB1CTRL, RXB1CTRL.w);
+
+    t_MCP_RXB0CTRL  RXB0CTRL_READ;
+    RXB0CTRL_READ.w = read_register(MCP_RXB0CTRL);
+    // if (RXB0CTRL_READ.b.RXM != RXB0CTRL.b.RXM) return false;
+    SERIAL_PORT_MONITOR.println(RXB0CTRL_READ.w, HEX);
+
+    t_MCP_RXB1CTRL  RXB1CTRL_READ;
+    RXB1CTRL_READ.w = read_register(MCP_RXB1CTRL);
+    // if (RXB1CTRL_READ.b.RXM != RXB1CTRL.b.RXM) return false;
+    SERIAL_PORT_MONITOR.println(RXB1CTRL_READ.w, HEX);
+
+    write_register(MCP_CNF1, CNF1.w);
+    write_register(MCP_CNF2, CNF2.w);
+    write_register(MCP_CNF3, CNF3.w);
+
+    // SERIAL_PORT_MONITOR.println(CNF1.w, HEX);
+    // SERIAL_PORT_MONITOR.println(CNF2.w, HEX);
+    // SERIAL_PORT_MONITOR.println(CNF3.w, HEX);
+
+    // write_register(MCP_CNF1, 0x00);
+    // write_register(MCP_CNF2, 0xD0);
+    // write_register(MCP_CNF3, 0x82);
+
+    data = read_register(MCP_CNF1);
+    if (data != CNF1.w) return false;
+
+    data = read_register(MCP_CNF2);
+    if (data != CNF2.w) return false;
+
+    data = read_register(MCP_CNF3);
+    if (data != CNF3.w) return false;
 
     CANCTRL.w           = 0;
     CANCTRL.b.CLKEN     = mode.clockout_enable;

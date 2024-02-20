@@ -43,12 +43,10 @@ void setup() {
     param.propagation_delay     = 0;
     param.triple_sample_point   = true;
 
-    // param.receive_buff_option   = MCP_RX_FLT_ANY;
-    // param.rollover_enable       = false;
+    param.receive_buff_option   = MCP_RX_FLT_ANY;
+    param.rollover_enable       = false;
 
     SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
-
-
 }
 
 uint8_t data_rx[8];
@@ -62,16 +60,15 @@ void loop() {
     frame.data = data_arr;
     mcp2515.transfer(frame);
 
-    delay(100);
+    delay(1000);
 
-    // if(mcp2515.checkRXBuffer(data_rx)){
-    //     for (int i = 0; i < 8; i++){
-    //         SERIAL_PORT_MONITOR.print(data_rx[i], HEX);
-    //         SERIAL_PORT_MONITOR.print(" ");
-    //     }
-    //     SERIAL_PORT_MONITOR.println(" ");
-    // }
-
+    if(mcp2515.checkRXBuffer(data_rx)){
+        for (int i = 0; i < 8; i++){
+            SERIAL_PORT_MONITOR.print(data_rx[i], HEX);
+            SERIAL_PORT_MONITOR.print(" ");
+        }
+        SERIAL_PORT_MONITOR.println(" ");
+    }
 }
 
 // END FILE
