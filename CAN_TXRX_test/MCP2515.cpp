@@ -82,13 +82,13 @@ bool MCP2515 :: checkRXBuffer(uint8_t *ptr_array){
     RXB0DLC.w = read_register(MCP_RXB0DLC);
 
     if (CANINTF.b.RX0IF > 0){
-        SERIAL_PORT_MONITOR.print(CANINTF.w, HEX);
-        SERIAL_PORT_MONITOR.print(" ");
-        SERIAL_PORT_MONITOR.print(RXB0DLC.w, HEX);
+        // SERIAL_PORT_MONITOR.print(CANINTF.w, HEX);
+        // SERIAL_PORT_MONITOR.print(" ");
+        // SERIAL_PORT_MONITOR.print(RXB0DLC.w, HEX);
 
         write_register(MCP_CANINTF, 0);
 
-        SERIAL_PORT_MONITOR.println(" ");
+        // SERIAL_PORT_MONITOR.println(" ");
 
         for (int i = 0; i < 8; i ++){
             *(ptr_array + i) = read_register(MCP_RXB0D_START + i);

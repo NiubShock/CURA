@@ -31,6 +31,19 @@
 class N5CANOpen {
     public:
 
+        typedef struct {
+            uint32_t        pole_pair;
+            uint32_t        max_current;
+            uint32_t        rated_current;
+            uint16_t        max_perth_current;
+            uint32_t        max_duration_peak_current;
+        } t_Motor_Data;
+
+        typedef struct {
+            uint32_t        max_speed;
+            uint32_t        max_current;
+        } t_Control_Para;
+
         typedef union {
             struct {
                 uint8_t     command;
@@ -38,16 +51,23 @@ class N5CANOpen {
                 union {
                     uint8_t     index_arr[2];
                     uint16_t    index;
-                } index;
+                } i;
 
                 uint8_t     subindex;
-
-                uint8_t     payload[4];
+                
+                union {
+                    uint8_t     payload[4];
+                    uint32_t    payload_32t;
+                } p;
             } b;
             uint8_t         array[8];
         } t_N5_Frame;
 
+        void begin();
+        void clearFrame(t_N5_Frame *frame);
+        bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
         void loadDictionary(uint8_t cmd, uint16_t index, uint8_t subindex, uint8_t ptr_payload[], uint8_t size, t_N5_Frame * frame);
+        bool setMotorData(t_Motor_Data para);
 };
 
 
