@@ -58,6 +58,13 @@ class N5CANOpen {
                 union {
                     uint8_t     payload[4];
                     uint32_t    payload_32t;
+
+                    struct {
+                        uint8_t size;
+                        uint8_t subindex;
+                        uint16_t index;
+                    }rx_pdo;
+
                 } p;
             } b;
             uint8_t         array[8];
@@ -68,6 +75,10 @@ class N5CANOpen {
         bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
         void loadDictionary(uint8_t cmd, uint16_t index, uint8_t subindex, uint8_t ptr_payload[], uint8_t size, t_N5_Frame * frame);
         bool setMotorData(t_Motor_Data para);
+        void startAutoCalibration();
+        void setControlLoop();
+        void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
+        uint8_t loadDownloadSize(uint8_t size);
 };
 
 

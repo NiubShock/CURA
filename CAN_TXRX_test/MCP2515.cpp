@@ -130,6 +130,34 @@ bool MCP2515 :: begin(t_MCP2515_Init_Param param, t_MCP2515_Mode mode) {
     SPI.begin();
     SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
 
+    // digitalWrite(cs_pin, LOW);
+    // SPI.transfer(MCP_RESET);
+    // SPI.transfer(0x70);
+    // SPI.transfer(0x00);
+    // digitalWrite(cs_pin, HIGH);
+
+    // digitalWrite(cs_pin, LOW);
+    // SPI.transfer(0xA0);
+    // SPI.transfer(0x34);
+    // SPI.transfer(0x02);
+    // SPI.transfer(0x00);
+    // digitalWrite(cs_pin, HIGH);
+
+    // digitalWrite(cs_pin, LOW);
+    // SPI.transfer(0xA0);
+    // SPI.transfer(0xF0);
+    // SPI.transfer(0x07);
+    // SPI.transfer(0x01);
+    // digitalWrite(cs_pin, HIGH);
+
+    // digitalWrite(cs_pin, LOW);
+    // SPI.transfer(0xc0);
+    // SPI.transfer(0x70);
+    // SPI.transfer(0x00);
+    // digitalWrite(cs_pin, HIGH);
+
+
+
     CANCTRL.w = 0;
     CANSTAT.w = 0;
 

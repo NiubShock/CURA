@@ -41,7 +41,7 @@ void setup() {
     // SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
 }
 
-uint8_t data_rx[8];
+// uint8_t data_rx[8];
 
 void loop() {
     N5CANOpen :: t_Motor_Data para;
