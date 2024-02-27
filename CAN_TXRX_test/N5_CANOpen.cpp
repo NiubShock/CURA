@@ -149,44 +149,50 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
 
     /* Load encoder para */
 
-    frame.b.command         = N5_SDO_DOWN_CMD_4B;
-    frame.b.i.index         = 0x1400;
-    frame.b.subindex        = 0x01;
-    frame.b.p.payload_32t   = 0x80000201;
+    uint16_t add_reg = 0x6073;
+    uint8_t reg_subind = 0x00;
+    uint8_t reg_size = 0x10;
 
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
+    setRXPDO(&add_reg, &reg_subind, &reg_size, 1);
 
-    /* Load max duration in obj 0x1600:00 */
-    frame.b.command         = N5_SDO_DOWN_CMD_1B;
-    frame.b.i.index         = 0x1600;
-    frame.b.subindex        = 0x00;
-    frame.b.p.payload_32t   = 0x00;
+    // frame.b.command         = N5_SDO_DOWN_CMD_4B;
+    // frame.b.i.index         = 0x1400;
+    // frame.b.subindex        = 0x01;
+    // frame.b.p.payload_32t   = 0x80000201;
 
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
+    // frame_mcp.data = frame.array;
+    // mcp2515.transfer(frame_mcp);
+    // mcp2515.checkRXBuffer(frame_rx.array, 100);
 
-    /* Load the object 6073:00 16bits in 1600:01 */
-    frame.b.command         = N5_SDO_DOWN_CMD_4B;
-    frame.b.i.index         = 0x1600;
-    frame.b.subindex        = 0x01;
-    frame.b.p.payload_32t   = 0x60730010; 
+    // /* Load max duration in obj 0x1600:00 */
+    // frame.b.command         = N5_SDO_DOWN_CMD_1B;
+    // frame.b.i.index         = 0x1600;
+    // frame.b.subindex        = 0x00;
+    // frame.b.p.payload_32t   = 0x00;
 
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
+    // frame_mcp.data = frame.array;
+    // mcp2515.transfer(frame_mcp);
+    // mcp2515.checkRXBuffer(frame_rx.array, 100);
 
-    /* Load max duration in obj 0x1600:00 */
-    frame.b.command         = N5_SDO_DOWN_CMD_1B;
-    frame.b.i.index         = 0x1600;
-    frame.b.subindex        = 0x00;
-    frame.b.p.payload_32t   = 0x01;
+    // /* Load the object 6073:00 16bits in 1600:01 */
+    // frame.b.command         = N5_SDO_DOWN_CMD_4B;
+    // frame.b.i.index         = 0x1600;
+    // frame.b.subindex        = 0x01;
+    // frame.b.p.payload_32t   = 0x60730010; 
 
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
+    // frame_mcp.data = frame.array;
+    // mcp2515.transfer(frame_mcp);
+    // mcp2515.checkRXBuffer(frame_rx.array, 100);
+
+    // /* Load max duration in obj 0x1600:00 */
+    // frame.b.command         = N5_SDO_DOWN_CMD_1B;
+    // frame.b.i.index         = 0x1600;
+    // frame.b.subindex        = 0x00;
+    // frame.b.p.payload_32t   = 0x01;
+
+    // frame_mcp.data = frame.array;
+    // mcp2515.transfer(frame_mcp);
+    // mcp2515.checkRXBuffer(frame_rx.array, 100);
 
     uint8_t data_sampe[8];
     data_sampe[0] = 0x00;
@@ -205,7 +211,7 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     
     // if (!checkTXAnswer(frame, frame_rx)) return false;
 
-    startAutoCalibration();
+    // startAutoCalibration();
 
     return true;
 }
@@ -317,6 +323,14 @@ uint8_t N5CANOpen :: loadDownloadSize(uint8_t size) {
 }
 
 void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size) {
+    
+    t_N5_Frame frame;
+    t_N5_Frame frame_rx;
+    MCP2515::t_MCP2515_CAN_Frame frame_mcp;
+
+    frame_mcp.ID            = 0x601;
+    frame_mcp.data_length   = 8;
+
     /* Enable the modification */
     frame.b.command         = N5_SDO_DOWN_CMD_4B;
     frame.b.i.index         = 0x1400;
@@ -346,6 +360,10 @@ void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_
         frame.b.p.rx_pdo.size       = *(ptr_reg_size + i);
         frame.b.p.rx_pdo.subindex   = *(ptr_subindex + i);
         frame.b.p.rx_pdo.index      = *(ptr_register + i);
+
+        frame_mcp.data = frame.array;
+        mcp2515.transfer(frame_mcp);
+        mcp2515.checkRXBuffer(frame_rx.array, 100);
     }
 
     /* Load max duration in obj 0x1600:00 */

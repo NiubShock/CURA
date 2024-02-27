@@ -79,6 +79,7 @@ class N5CANOpen {
         void setControlLoop();
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
         uint8_t loadDownloadSize(uint8_t size);
+        void startPositionProfile();
 };
 
 
