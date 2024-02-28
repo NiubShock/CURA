@@ -44,8 +44,19 @@ class N5CANOpen {
             uint32_t        max_current;
         } t_Control_Para;
 
+        void begin();
+        bool setMotorData(t_Motor_Data para);
+        void startAutoCalibration();
+        void setControlLoop();
+        void startPositionProfile();
+        
+
+    private:
+    
         typedef union {
             struct {
+                uint16_t    ID;
+                uint16_t    data_length;
                 uint8_t     command;
 
                 union {
@@ -70,16 +81,11 @@ class N5CANOpen {
             uint8_t         array[8];
         } t_N5_Frame;
 
-        void begin();
-        void clearFrame(t_N5_Frame *frame);
         bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
-        void loadDictionary(uint8_t cmd, uint16_t index, uint8_t subindex, uint8_t ptr_payload[], uint8_t size, t_N5_Frame * frame);
-        bool setMotorData(t_Motor_Data para);
-        void startAutoCalibration();
-        void setControlLoop();
+        void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, t_N5_Frame frame_answ);
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
         uint8_t loadDownloadSize(uint8_t size);
-        void startPositionProfile();
+        void defPDOMapping();
 };
 
 
