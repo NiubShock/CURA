@@ -30,29 +30,10 @@
 
 
 class N5CANOpen {
-    public:
-
-        typedef struct {
-            uint32_t        pole_pair;
-            uint32_t        max_current;
-            uint32_t        rated_current;
-            uint16_t        max_perth_current;
-            uint32_t        max_duration_peak_current;
-        } t_Motor_Data;
-
-        typedef struct {
-            uint32_t        max_speed;
-            uint32_t        max_current;
-        } t_Control_Para;
-
-        void begin();
-        bool setMotorData(t_Motor_Data para);
-        void startAutoCalibration();
-        void setControlLoop();
-        void startPositionProfile();
-        
 
     private:
+
+        MCP2515 mcp2515;
     
         typedef union {
             struct {
@@ -85,6 +66,29 @@ class N5CANOpen {
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
         uint8_t loadDownloadSize(uint8_t size);
         void defPDOMapping();
+
+    public:
+
+        typedef struct {
+            uint32_t        pole_pair;
+            uint32_t        max_current;
+            uint32_t        rated_current;
+            uint16_t        max_perth_current;
+            uint32_t        max_duration_peak_current;
+        } t_Motor_Data;
+
+        typedef struct {
+            uint32_t        max_speed;
+            uint32_t        max_current;
+        } t_Control_Para;
+
+        void begin();
+        bool setMotorData(t_Motor_Data para);
+        void startAutoCalibration();
+        void setControlLoop();
+        void startPositionProfile();
+
+        void printCANData(t_N5_Frame frame);
 };
 
 
