@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "arduino.h"
+#include "MCP2515.h"
 
 #define N5_ADDRESS                  1
 
@@ -55,8 +56,6 @@ class N5CANOpen {
     
         typedef union {
             struct {
-                uint16_t    ID;
-                uint16_t    data_length;
                 uint8_t     command;
 
                 union {
@@ -82,7 +81,7 @@ class N5CANOpen {
         } t_N5_Frame;
 
         bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
-        void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, t_N5_Frame frame_answ);
+        void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, t_N5_Frame *frame_answ);
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
         uint8_t loadDownloadSize(uint8_t size);
         void defPDOMapping();
