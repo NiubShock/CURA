@@ -61,6 +61,20 @@ class N5CANOpen {
             uint8_t         array[8];
         } t_N5_Frame;
 
+        typedef union {
+            union {
+                uint8_t     payload[4];
+                uint32_t    payload_32t;
+
+                struct {
+                    uint8_t size;
+                    uint8_t subindex;
+                    uint16_t index;
+                }rx_pdo;
+
+            } p;
+        } t_N5_Payload;
+
         bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
         void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, t_N5_Frame *frame_answ);
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);

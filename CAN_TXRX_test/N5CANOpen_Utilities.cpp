@@ -61,53 +61,33 @@ void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_
     t_N5_Frame frame_rx;
     MCP2515::t_MCP2515_CAN_Frame frame_mcp;
 
-    frame_mcp.ID            = 0x601;
-    frame_mcp.data_length   = 8;
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x1400, 0x01, 0x80000201, &frame_rx);
+    printCANData(frame_rx);
 
-    /* Enable the modification */
-    frame.b.command         = N5_SDO_DOWN_CMD_4B;
-    frame.b.i.index         = 0x1400;
-    frame.b.subindex        = 0x01;
-    frame.b.p.payload_32t   = 0x80000201;
-
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
-
-    /* Disable the profile */
-    frame.b.command         = N5_SDO_DOWN_CMD_1B;
-    frame.b.i.index         = 0x1600;
-    frame.b.subindex        = 0x00;
-    frame.b.p.payload_32t   = 0x00;
-
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_1B, 0x1600, 0x00, 0x00, &frame_rx);
+    printCANData(frame_rx);
 
     /* Load the objects */
     for (int i = 0; i < size; i++) {
-        frame.b.command             = loadDownloadSize(4);
-        frame.b.i.index             = 0x1600;
-        frame.b.subindex            = 1 + i;
 
-        frame.b.p.rx_pdo.size       = *(ptr_reg_size + i);
-        frame.b.p.rx_pdo.subindex   = *(ptr_subindex + i);
-        frame.b.p.rx_pdo.index      = *(ptr_register + i);
+        t_N5_Payload payload;
 
-        frame_mcp.data = frame.array;
-        mcp2515.transfer(frame_mcp);
-        mcp2515.checkRXBuffer(frame_rx.array, 100);
+        payload.p.rx_pdo.size       = *(ptr_reg_size + i);
+        payload.p.rx_pdo.subindex   = *(ptr_subindex + i);
+        payload.p.rx_pdo.index      = *(ptr_register + i);
+
+        sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x1600, 1 + i, payload.p.payload_32t, &frame_rx);
+        printCANData(frame_rx);
     }
 
-    /* Load max duration in obj 0x1600:00 */
-    frame.b.command         = N5_SDO_DOWN_CMD_1B;
-    frame.b.i.index         = 0x1600;
-    frame.b.subindex        = 0x00;
-    frame.b.p.payload_32t   = size;
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_1B, 0x1600, 0x00, size, &frame_rx);
+    printCANData(frame_rx);
 
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x1400, 0x01, 0x201, &frame_rx);
+    printCANData(frame_rx);
+
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x1010, 0x03, 0x65766173, &frame_rx);
+    printCANData(frame_rx);
 }
 
 void N5CANOpen :: defPDOMapping() {

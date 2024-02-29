@@ -25,7 +25,7 @@ void N5CANOpen :: begin(){
     SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
 
     /* Write the PDO mapping for the RX - 6040:00, 6060:00, 6042:00 */
-    // defPDOMapping();
+    defPDOMapping();
 }
 
 bool N5CANOpen :: setMotorData(t_Motor_Data para) {
