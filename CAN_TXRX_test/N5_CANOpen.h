@@ -62,6 +62,25 @@ class N5CANOpen {
         } t_N5_Frame;
 
         typedef union {
+            struct {
+                uint16_t    r_6040;
+                uint8_t     r_6060;
+                uint16_t    r_6042;
+                uint8_t     empty[3];
+            } b;
+            uint8_t         array[8];
+        } t_N5_RXPDO;
+
+        typedef union {
+            struct {
+                uint16_t    r_6041;
+                uint8_t     r_6061;
+                uint8_t     empty[5];
+            } b;
+            uint8_t         array[8];
+        } t_N5_TXPDO;
+
+        typedef union {
             union {
                 uint8_t     payload[4];
                 uint32_t    payload_32t;
@@ -76,7 +95,10 @@ class N5CANOpen {
         } t_N5_Payload;
 
         bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
-        void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, t_N5_Frame *frame_answ);
+        
+        void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, uint8_t *frame_answ);
+        void sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t *ptr_data, uint8_t *frame_answ);
+        
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
         uint8_t loadDownloadSize(uint8_t size);
         void defPDOMapping();

@@ -35,22 +35,22 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
 
     // mcp2515.checkRXBuffer(frame_rx.array, 100);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2030, 0x00, para.pole_pair, &frame_rx);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2030, 0x00, para.pole_pair, frame_rx.array);
     printCANData(frame_rx);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2031, 0x00, para.max_current, &frame_rx);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2031, 0x00, para.max_current, frame_rx.array);
     printCANData(frame_rx);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x203B, 0x01, para.rated_current, &frame_rx);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x203B, 0x01, para.rated_current, frame_rx.array);
     printCANData(frame_rx);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x203B, 0x02, para.max_duration_peak_current, &frame_rx);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x203B, 0x02, para.max_duration_peak_current, frame_rx.array);
     printCANData(frame_rx);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x40, &frame_rx);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x40, frame_rx.array);
     printCANData(frame_rx);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2059, 0x00, 0x00, &frame_rx);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2059, 0x00, 0x00, frame_rx.array);
     printCANData(frame_rx);
 
     /* Autosetup */
@@ -83,53 +83,50 @@ void N5CANOpen :: setControlLoop() {
 }
 
 void N5CANOpen :: startAutoCalibration() {
-    t_N5_Frame frame;
-    t_N5_Frame frame_rx;
-    MCP2515::t_MCP2515_CAN_Frame frame_mcp;
+    t_N5_RXPDO  rxpdo;
+    t_N5_TXPDO  txpdo;
+    t_N5_Frame  frame_rx;
+    uint8_t     data_sampe[8];
 
-    frame_mcp.ID            = 0x601;
-    frame_mcp.data_length   = 8;
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2300, 0x00, 0x00, frame_rx.array);
+    printCANData(frame_rx);
 
-    /* Disable nanoJ */
-    frame.b.command         = N5_SDO_DOWN_CMD_4B;
-    frame.b.i.index         = 0x2030;
-    frame.b.subindex        = 0x00;
-    frame.b.p.payload_32t   = 0x00;
+    for(int i = 0; i < 8; i++) rxpdo.array[i] = 0;
+    rxpdo.b.r_6040 = 0x06;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    printCANData(frame_rx);
 
-    frame_mcp.data = frame.array;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
-
-    uint16_t add_reg[] = {0x6060, 0x6040};
-    uint8_t reg_subind[] = {0x00, 0x00};
-    uint8_t reg_size[] = {0x08, 0x10};
-
-    setRXPDO(add_reg, reg_subind, reg_size, 2);
-
-    uint8_t data_sampe[8];
-    for (int i = 0; i < 8; i++) data_sampe[i] = 0;
-
-    data_sampe[7]           = 0xFE;     // select autosetup
-    data_sampe[6]           = 0x08;     // start autosetup
-    frame_mcp.ID            = 0x201;
-
-    frame_mcp.data = data_sampe;
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_rx.array, 100);
-
-    frame_mcp.ID            = 0x601;
-
+    /* READ */
     do {
-        delay(1000);
-        frame.b.command         = N5_SDO_UP_REQ;
-        frame.b.i.index           = 0x6041;
-        frame.b.subindex        = 0x00;
-        frame.b.p.payload_32t   = 0;
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, txpdo.array);
+        // printCANData(txpdo);
+    } while(txpdo.b.r_6041 != 0x221);
 
-        frame_mcp.data = frame.array;
-        mcp2515.transfer(frame_mcp);
-        mcp2515.checkRXBuffer(frame_rx.array, 100);
-    } while ((frame_rx.b.p.payload_32t & (1 << 12)) == 0);
+    // rxpdo.b.r_6040 = 0x07;
+    // rxpdo.b.r_6060 = 0xFE;
+    // sendFrameWAnswer(0x201, 8, rxpdo.array);
+    // printCANData(frame_rx);
+
+    // /* READ */
+
+    // rxpdo.b.r_6040 = 0x0F;
+    // sendFrameWAnswer(0x201, 8, rxpdo.array);
+    // printCANData(frame_rx);
+
+    // /* READ */
+
+    // /* READ */
+
+    // rxpdo.b.r_6040 = 0x1F;
+    // sendFrameWAnswer(0x201, 8, rxpdo.array);
+    // printCANData(frame_rx);
+
+    // /* READ */
+    
+    // rxpdo.b.r_6040 = 0x00;
+    // sendFrameWAnswer(0x201, 8, rxpdo.array);
+    // printCANData(frame_rx);
+
 }
 
 void N5CANOpen :: startPositionProfile() {
