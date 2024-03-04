@@ -73,7 +73,7 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     // frame_mcp.data = data_sampe;
     // mcp2515.transfer(frame_mcp);
 
-    // startAutoCalibration();
+    startAutoCalibration();
 
     return true;
 }
@@ -97,35 +97,42 @@ void N5CANOpen :: startAutoCalibration() {
     printCANData(frame_rx);
 
     /* READ */
-    do {
-        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, txpdo.array);
-        // printCANData(txpdo);
-    } while(txpdo.b.r_6041 != 0x221);
+    // do {
+    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, txpdo.array);
+    //     // printCANData(txpdo);
+    //     delay(1);
+    // } while(txpdo.b.r_6041 != 0x221);
 
-    // rxpdo.b.r_6040 = 0x07;
-    // rxpdo.b.r_6060 = 0xFE;
-    // sendFrameWAnswer(0x201, 8, rxpdo.array);
-    // printCANData(frame_rx);
+    rxpdo.b.r_6040 = 0x07;
+    rxpdo.b.r_6060 = 0xFE;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    printCANData(frame_rx);
 
-    // /* READ */
+    /* READ */
+    // do {
+    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, txpdo.array);
+    //     // printCANData(txpdo);
+    //     delay(1);
+    // } while(txpdo.b.r_6041 != 0x233);
 
-    // rxpdo.b.r_6040 = 0x0F;
-    // sendFrameWAnswer(0x201, 8, rxpdo.array);
-    // printCANData(frame_rx);
 
-    // /* READ */
+    rxpdo.b.r_6040 = 0x0F;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    printCANData(frame_rx);
 
-    // /* READ */
+    /* READ */
 
-    // rxpdo.b.r_6040 = 0x1F;
-    // sendFrameWAnswer(0x201, 8, rxpdo.array);
-    // printCANData(frame_rx);
+    /* READ */
 
-    // /* READ */
+    rxpdo.b.r_6040 = 0x1F;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    printCANData(frame_rx);
+
+    /* READ */
     
-    // rxpdo.b.r_6040 = 0x00;
-    // sendFrameWAnswer(0x201, 8, rxpdo.array);
-    // printCANData(frame_rx);
+    rxpdo.b.r_6040 = 0x00;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    printCANData(frame_rx);
 
 }
 
