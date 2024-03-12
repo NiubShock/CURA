@@ -1,4 +1,9 @@
 #include "MCP2515.h"
+#include "arduino.h"
+#include "mcp2515_can.h"
+
+const int SPI_CS_PIN  = 9;
+mcp2515_can CAN(SPI_CS_PIN);
 
 void MCP2515 :: set_cs_pin(int pin){
     cs_pin = pin;
@@ -33,30 +38,34 @@ bool MCP2515 :: write_register(uint8_t address, uint8_t data) {
 
 }
 
-bool MCP2515 :: transfer(t_MCP2515_CAN_Frame frame) {
-    uint8_t id_h, id_l;
+bool MCP2515 :: transfer(t_MCP2515_CAN_Frame *frame) {
+    // uint8_t id_h, id_l;
 
-    id_h = frame.ID >> 3;
-    id_l = frame.ID << 5;
+    // id_h = frame ->ID >> 3;
+    // id_l = frame ->ID << 5;
 
-    /* Load the ID */
-    write_register(MCP_TXB0SIDH, id_h);
-    write_register(MCP_TXB0SIDL, id_l);
+    // /* Load the ID */
+    // write_register(MCP_TXB0SIDH, id_h);
+    // write_register(MCP_TXB0SIDL, id_l);
 
-    /* Load the DLC */
-    write_register(MCP_TXB0DLC, frame.data_length);
+    // /* Load the DLC */
+    // write_register(MCP_TXB0DLC, frame ->data_length);
+    // if (frame ->data_length == 2) {
+    //     SERIAL_PORT_MONITOR.print("Loading frame ");
+    //     SERIAL_PORT_MONITOR.println(read_register(MCP_TXB0DLC));
+    // }
 
-    /* Load the data */
-    for (int i = 0; i < frame.data_length; i++){
-        write_register(MCP_TXB0D_START + i, frame.data[i]);
-    }
+    // /* Load the data */
+    // for (int i = 0; i < frame ->data_length; i++){
+    //     write_register(MCP_TXB0D_START + i, frame ->data[i]);
+    // }
 
-    /* Send the data */
-    write_register(MCP_TXB0CTRL, MCP_TXB_TXREQ_M);
+    // /* Send the data */
+    // write_register(MCP_TXB0CTRL, MCP_TXB_TXREQ_M);
 
-    /* Check data tx completed */
-    uint8_t data;
-    bool    tx_completed = false;
+    // /* Check data tx completed */
+    // uint8_t data;
+    // bool    tx_completed = false;
 
     // for(int i = 0; i < CANSENDTIMEOUT && !tx_completed; i++){
 
@@ -68,7 +77,9 @@ bool MCP2515 :: transfer(t_MCP2515_CAN_Frame frame) {
     //     delay(1);
     // }
 
-    return tx_completed;
+    CAN.sendMsgBuf(frame ->ID, 0, frame ->data_length, frame ->data);
+
+    return false;
 }
 
 bool MCP2515 :: checkRXBuffer(uint8_t *ptr_array){
@@ -107,6 +118,13 @@ bool MCP2515 :: checkRXBuffer(uint8_t *ptr_array, uint16_t delay_ms){
     }
 
     return read;
+}
+
+bool MCP2515 :: begin(uint8_t speed) {
+  while (CAN_OK != CAN.begin(speed)) {             // init can bus : baudrate = 500k
+        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
+        delay(100);
+  }
 }
 
 bool MCP2515 :: begin(t_MCP2515_Init_Param param, t_MCP2515_Mode mode) {

@@ -28,6 +28,18 @@
 
 #define N5_SDO_UD_ERR               0x80
 
+#define OPERATIONAL_STATE           0x01
+#define STOP_STATE                  0x02
+#define PREOP_STATE                 0x80
+#define NODE_RESET_STATE            0x81
+#define COMM_RESET_STATE            0x82
+
+#define READY_TO_ON                 0x01
+#define CURRENTLY_ON                0x02
+#define READY_TO_OPERATE            0x03
+#define TARGET_REACHED              0x04
+
+
 
 class N5CANOpen {
 
@@ -73,9 +85,10 @@ class N5CANOpen {
 
         typedef union {
             struct {
+                uint16_t    unused;
                 uint16_t    r_6041;
                 uint8_t     r_6061;
-                uint8_t     empty[5];
+                uint8_t     empty[3];
             } b;
             uint8_t         array[8];
         } t_N5_TXPDO;
@@ -125,6 +138,12 @@ class N5CANOpen {
         void startPositionProfile();
 
         void printCANData(t_N5_Frame frame);
+        void printCANData(uint8_t *array);
+
+        void setIP(uint32_t IP);
+        void switchState(uint8_t state, uint8_t node_ID);
+
+        void check6041Status(uint16_t status);
 };
 
 

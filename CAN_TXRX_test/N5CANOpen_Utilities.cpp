@@ -19,8 +19,8 @@ void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t co
     frame_mcp.data          = frame.array;
 
     /* Send the data and wait for the answer */
-    mcp2515.transfer(frame_mcp);
-    mcp2515.checkRXBuffer(frame_answ, 100);
+    mcp2515.transfer(&frame_mcp);
+    if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_answ, 100);
 
     // for (int i = 0; i < 8; i++) frame_answ ->array[i] = *(frame_mcp_rx.data + i);
 }
@@ -34,7 +34,7 @@ void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t *p
     frame_mcp.data_length   = data_length;
     frame_mcp.data          = ptr_data;
 
-    mcp2515.transfer(frame_mcp);
+    mcp2515.transfer(&frame_mcp);
     if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_answ, 100);
 }
 
@@ -66,6 +66,33 @@ uint8_t N5CANOpen :: loadDownloadSize(uint8_t size) {
     if (size == 4) return N5_SDO_DOWN_CMD_4B;
 
     return 0;
+}
+
+//0xC0A89602
+void N5CANOpen :: setIP(uint32_t IP) {
+    t_N5_Frame frame_rx;
+
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2010, 0x00, 0x1, frame_rx.array);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2011, 0x00, IP, frame_rx.array);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2012, 0x00, 0xFFFFFF00, frame_rx.array);
+
+    /* Save the configuration */
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x1010, 0x0C, 0x65766173, frame_rx.array);
+
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x2014, 0x00, 0x00, frame_rx.array);
+}
+
+void N5CANOpen :: switchState(uint8_t state, uint8_t node_ID) {
+    t_N5_Frame frame_rx;
+    uint8_t data[8];
+
+    for (int i = 0; i < 8; i++) data[i] = 0;
+
+    data[0] = state;
+    data[1] = node_ID;
+
+    sendFrameWAnswer(0x00, 2, data, frame_rx.array);
+    printCANData(frame_rx);
 }
 
 void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size) {
@@ -117,4 +144,35 @@ void N5CANOpen :: printCANData(t_N5_Frame frame){
       SERIAL_PORT_MONITOR.print(" ");
     }
     SERIAL_PORT_MONITOR.println(" ");
+}
+
+void N5CANOpen :: printCANData(uint8_t *array) {
+    for (int i = 0; i < 8; i++){
+      SERIAL_PORT_MONITOR.print(*(array + i), HEX);
+      SERIAL_PORT_MONITOR.print(" ");
+    }
+    SERIAL_PORT_MONITOR.println(" ");
+}
+
+void N5CANOpen :: check6041Status(uint16_t status) {
+    /* Ready to switch on is 0b01x0001 */
+    if (((status & 0x21) == 0x21) && ((status & 0x41) == 0)){
+        return READY_TO_ON;
+    }
+
+    /* Switched on is 0b01x0011 */
+    if (((status & 0x23) == 0x23) && ((status & 0x4C) == 0)){
+        return CURRENTLY_ON;
+    }
+
+    /* Operation enabled is 0b01x0111 */
+    if (((status & 0x27) == 0x27) && ((status & 0x48) == 0)){
+        return READY_TO_OPERATE;
+    }
+
+    /* Operation enabled is 0b1xxxxxxxxxx */
+    if (((status & 0x400) == 0x400)){
+        return TARGET_REACHED;
+    }
+
 }

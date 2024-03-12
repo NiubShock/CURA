@@ -1,9 +1,11 @@
 #include "N5_CANOpen.h"
 #include "MCP2515.h"
+#include "arduino.h"
 
 const int SPI_CS_PIN  = 9;
 
 void N5CANOpen :: begin(){
+    t_N5_Frame frame_rx;
     mcp2515.set_cs_pin(SPI_CS_PIN);
 
     MCP2515::t_MCP2515_Init_Param   param;
@@ -24,6 +26,8 @@ void N5CANOpen :: begin(){
 
     SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
 
+    /* Set to preoperational state */
+    switchState(PREOP_STATE, 0x00);
     /* Write the PDO mapping for the RX - 6040:00, 6060:00, 6042:00 */
     defPDOMapping();
 }
@@ -73,8 +77,6 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     // frame_mcp.data = data_sampe;
     // mcp2515.transfer(frame_mcp);
 
-    startAutoCalibration();
-
     return true;
 }
 
@@ -87,49 +89,74 @@ void N5CANOpen :: startAutoCalibration() {
     t_N5_TXPDO  txpdo;
     t_N5_Frame  frame_rx;
     uint8_t     data_sampe[8];
+    uint8_t data_Empty[8];
+
+    /* Set to operational state */
+    switchState(OPERATIONAL_STATE, 0x00);
 
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2300, 0x00, 0x00, frame_rx.array);
     printCANData(frame_rx);
 
+    SERIAL_PORT_MONITOR.println("Send frame 1");
     for(int i = 0; i < 8; i++) rxpdo.array[i] = 0;
     rxpdo.b.r_6040 = 0x06;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
-    printCANData(frame_rx);
 
     /* READ */
-    // do {
-    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, txpdo.array);
-    //     // printCANData(txpdo);
-    //     delay(1);
-    // } while(txpdo.b.r_6041 != 0x221);
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        delay(1);
+    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != READY_TO_ON);
+
+    // /* Set to operational state */
+    // switchState(OPERATIONAL_STATE, 0x00);
+
+    SERIAL_PORT_MONITOR.println("Send frame 2");
 
     rxpdo.b.r_6040 = 0x07;
     rxpdo.b.r_6060 = 0xFE;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
-    printCANData(frame_rx);
 
     /* READ */
-    // do {
-    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, txpdo.array);
-    //     // printCANData(txpdo);
-    //     delay(1);
-    // } while(txpdo.b.r_6041 != 0x233);
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // printCANData(txpdo);
+        delay(1);
+    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != CURRENTLY_ON);
 
-
+    SERIAL_PORT_MONITOR.println("Send frame 3");
     rxpdo.b.r_6040 = 0x0F;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
     /* READ */
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // printCANData(txpdo);
+        delay(1);
+    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != READY_TO_OPERATE);
 
+    SERIAL_PORT_MONITOR.println("Reading 2 ");
     /* READ */
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6061, 0x00, 0x00, frame_rx.array);
+        // printCANData(txpdo);
+        delay(1);
+    } while(frame_rx.b.p.payload_32t != 0xFE);
 
+    SERIAL_PORT_MONITOR.println("Send frame 4");
     rxpdo.b.r_6040 = 0x1F;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
     /* READ */
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // printCANData(txpdo);
+        delay(1);
+    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != TARGET_REACHED);
     
+    SERIAL_PORT_MONITOR.println("Send frame 5");
     rxpdo.b.r_6040 = 0x00;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
     printCANData(frame_rx);

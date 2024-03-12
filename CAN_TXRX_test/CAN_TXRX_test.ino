@@ -39,11 +39,6 @@ void setup() {
     // param.rollover_enable       = false;
 
     // SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
-}
-
-// uint8_t data_rx[8];
-
-void loop() {
     N5CANOpen :: t_Motor_Data para;
 
     para.pole_pair                      = 3;
@@ -54,6 +49,16 @@ void loop() {
 
   
     SERIAL_PORT_MONITOR.println(N5.setMotorData(para));
+
+    N5.startAutoCalibration();
+
+}
+
+// uint8_t data_rx[8];
+
+void loop() {
+
+    
     // MCP2515::t_MCP2515_CAN_Frame frame;
     // uint8_t data_arr[] = {0x40, 0x41, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00};
 
