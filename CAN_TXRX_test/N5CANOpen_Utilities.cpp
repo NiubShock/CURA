@@ -154,19 +154,20 @@ void N5CANOpen :: printCANData(uint8_t *array) {
     SERIAL_PORT_MONITOR.println(" ");
 }
 
-void N5CANOpen :: check6041Status(uint16_t status) {
+uint16_t N5CANOpen :: check6041Status(uint16_t status) {
+
     /* Ready to switch on is 0b01x0001 */
-    if (((status & 0x21) == 0x21) && ((status & 0x41) == 0)){
+    if (((status & 0x21) == 0x21)/* && ((status & 0x4E) == 0)*/){
         return READY_TO_ON;
     }
 
     /* Switched on is 0b01x0011 */
-    if (((status & 0x23) == 0x23) && ((status & 0x4C) == 0)){
+    if (((status & 0x23) == 0x23)/* && ((status & 0x4C) == 0)*/){
         return CURRENTLY_ON;
     }
 
     /* Operation enabled is 0b01x0111 */
-    if (((status & 0x27) == 0x27) && ((status & 0x48) == 0)){
+    if (((status & 0x27) == 0x27)/* && ((status & 0x48) == 0)*/){
         return READY_TO_OPERATE;
     }
 

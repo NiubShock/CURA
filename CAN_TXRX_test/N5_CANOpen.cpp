@@ -28,6 +28,7 @@ void N5CANOpen :: begin(){
 
     /* Set to preoperational state */
     switchState(PREOP_STATE, 0x00);
+    delay(1000);
     /* Write the PDO mapping for the RX - 6040:00, 6060:00, 6042:00 */
     defPDOMapping();
 }
@@ -93,6 +94,7 @@ void N5CANOpen :: startAutoCalibration() {
 
     /* Set to operational state */
     switchState(OPERATIONAL_STATE, 0x00);
+    delay(1000);
 
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2300, 0x00, 0x00, frame_rx.array);
     printCANData(frame_rx);
@@ -106,23 +108,31 @@ void N5CANOpen :: startAutoCalibration() {
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
         delay(1);
-    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != READY_TO_ON);
-
-    // /* Set to operational state */
-    // switchState(OPERATIONAL_STATE, 0x00);
+    } while((frame_rx.b.p.payload_32t & 0x21) != 0x21);
 
     SERIAL_PORT_MONITOR.println("Send frame 2");
 
-    rxpdo.b.r_6040 = 0x07;
+    /* Set to operational state */
+    switchState(OPERATIONAL_STATE, 0x00);
+    delay(1000);
+
     rxpdo.b.r_6060 = 0xFE;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+
+    delay(100);
+    rxpdo.b.r_6040 = 0x07;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+
+    /* Set to operational state */
+    switchState(OPERATIONAL_STATE, 0x00);
+    delay(1000);
 
     /* READ */
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        // printCANData(txpdo);
-        delay(1);
-    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != CURRENTLY_ON);
+        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(100);
+    } while((frame_rx.b.p.payload_32t & 0x23) != 0x23);
 
     SERIAL_PORT_MONITOR.println("Send frame 3");
     rxpdo.b.r_6040 = 0x0F;
@@ -132,15 +142,14 @@ void N5CANOpen :: startAutoCalibration() {
     /* READ */
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        // printCANData(txpdo);
+        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t & 0x27, HEX);
         delay(1);
-    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != READY_TO_OPERATE);
+    } while((frame_rx.b.p.payload_32t & 0x27) != 0x27);
 
     SERIAL_PORT_MONITOR.println("Reading 2 ");
     /* READ */
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6061, 0x00, 0x00, frame_rx.array);
-        // printCANData(txpdo);
         delay(1);
     } while(frame_rx.b.p.payload_32t != 0xFE);
 
@@ -152,9 +161,9 @@ void N5CANOpen :: startAutoCalibration() {
     /* READ */
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        // printCANData(txpdo);
+        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
         delay(1);
-    } while(check6041Status((uint16_t)frame_rx.b.p.payload_32t) != TARGET_REACHED);
+    } while((frame_rx.b.p.payload_32t & 0x400) != 0x400);
     
     SERIAL_PORT_MONITOR.println("Send frame 5");
     rxpdo.b.r_6040 = 0x00;

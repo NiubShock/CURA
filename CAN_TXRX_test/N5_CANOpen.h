@@ -143,7 +143,7 @@ class N5CANOpen {
         void setIP(uint32_t IP);
         void switchState(uint8_t state, uint8_t node_ID);
 
-        void check6041Status(uint16_t status);
+        uint16_t check6041Status(uint16_t status);
 };
 
 
