@@ -51,6 +51,7 @@ void setup() {
     SERIAL_PORT_MONITOR.println(N5.setMotorData(para));
 
     N5.startAutoCalibration();
+    N5.startPositionProfile();
 
 }
 

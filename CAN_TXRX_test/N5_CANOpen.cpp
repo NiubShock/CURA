@@ -26,6 +26,9 @@ void N5CANOpen :: begin(){
 
     SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
 
+    // switchState(NODE_RESET_STATE, 0x00);
+    // delay(1000);
+
     /* Set to preoperational state */
     switchState(PREOP_STATE, 0x00);
     delay(1000);
@@ -105,10 +108,10 @@ void N5CANOpen :: startAutoCalibration() {
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
     /* READ */
-    do {
-        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        delay(1);
-    } while((frame_rx.b.p.payload_32t & 0x21) != 0x21);
+    // do {
+    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+    //     delay(10);
+    // } while((frame_rx.b.p.payload_32t & 0x221) != 0x221);
 
     SERIAL_PORT_MONITOR.println("Send frame 2");
 
@@ -124,15 +127,15 @@ void N5CANOpen :: startAutoCalibration() {
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
     /* Set to operational state */
-    switchState(OPERATIONAL_STATE, 0x00);
-    delay(1000);
+    // switchState(OPERATIONAL_STATE, 0x00);
+    // delay(1000);
 
     /* READ */
-    do {
-        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
-        delay(100);
-    } while((frame_rx.b.p.payload_32t & 0x23) != 0x23);
+    // do {
+    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+    //     // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+    //     delay(10);
+    // } while((frame_rx.b.p.payload_32t & 0x233) != 0x233);
 
     SERIAL_PORT_MONITOR.println("Send frame 3");
     rxpdo.b.r_6040 = 0x0F;
@@ -140,18 +143,18 @@ void N5CANOpen :: startAutoCalibration() {
     printCANData(frame_rx);
 
     /* READ */
-    do {
-        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t & 0x27, HEX);
-        delay(1);
-    } while((frame_rx.b.p.payload_32t & 0x27) != 0x27);
+    // do {
+    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+    //     // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t & 0x27, HEX);
+    //     delay(10);
+    // } while((frame_rx.b.p.payload_32t & 0x237) != 0x237);
 
     SERIAL_PORT_MONITOR.println("Reading 2 ");
     /* READ */
-    do {
-        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6061, 0x00, 0x00, frame_rx.array);
-        delay(1);
-    } while(frame_rx.b.p.payload_32t != 0xFE);
+    // do {
+    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6061, 0x00, 0x00, frame_rx.array);
+    //     delay(10);
+    // } while(frame_rx.b.p.payload_32t != 0xFE);
 
     SERIAL_PORT_MONITOR.println("Send frame 4");
     rxpdo.b.r_6040 = 0x1F;
@@ -161,9 +164,9 @@ void N5CANOpen :: startAutoCalibration() {
     /* READ */
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
-        delay(1);
-    } while((frame_rx.b.p.payload_32t & 0x400) != 0x400);
+        // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x1237) != 0x1237);
     
     SERIAL_PORT_MONITOR.println("Send frame 5");
     rxpdo.b.r_6040 = 0x00;
@@ -173,5 +176,32 @@ void N5CANOpen :: startAutoCalibration() {
 }
 
 void N5CANOpen :: startPositionProfile() {
+
+    t_N5_RXPDO  rxpdo;
+
+    SERIAL_PORT_MONITOR.println("Send frame 1");
+    for(int i = 0; i < 8; i++) rxpdo.array[i] = 0;
+    rxpdo.b.r_6060 = 0x02;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+
+    rxpdo.b.r_6042 = 0xC8;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+
+    rxpdo.b.r_6040 = 0x06;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    delay(100);
+
+    rxpdo.b.r_6040 = 0x07;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    delay(100);
+
+    rxpdo.b.r_6040 = 0x0F;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    delay(100);
+
+
+    // delay(10000);
+    // rxpdo.b.r_6040 = 0x06;
+    // sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
 }
