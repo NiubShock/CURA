@@ -26,9 +26,6 @@ void N5CANOpen :: begin(){
 
     SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
 
-    // switchState(NODE_RESET_STATE, 0x00);
-    // delay(1000);
-
     /* Set to preoperational state */
     switchState(PREOP_STATE, 0x00);
     delay(1000);
@@ -54,6 +51,9 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
 
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x203B, 0x02, para.max_duration_peak_current, frame_rx.array);
     printCANData(frame_rx);
+
+    rxpdo.b.r_6073 = para.max_perth_current;
+    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x40, frame_rx.array);
     printCANData(frame_rx);
@@ -89,11 +89,10 @@ void N5CANOpen :: setControlLoop() {
 }
 
 void N5CANOpen :: startAutoCalibration() {
-    t_N5_RXPDO  rxpdo;
     t_N5_TXPDO  txpdo;
     t_N5_Frame  frame_rx;
     uint8_t     data_sampe[8];
-    uint8_t data_Empty[8];
+    uint8_t     data_Empty[8];
 
     /* Set to operational state */
     switchState(OPERATIONAL_STATE, 0x00);
@@ -103,7 +102,6 @@ void N5CANOpen :: startAutoCalibration() {
     printCANData(frame_rx);
 
     SERIAL_PORT_MONITOR.println("Send frame 1");
-    for(int i = 0; i < 8; i++) rxpdo.array[i] = 0;
     rxpdo.b.r_6040 = 0x06;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
@@ -127,8 +125,8 @@ void N5CANOpen :: startAutoCalibration() {
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
     /* Set to operational state */
-    // switchState(OPERATIONAL_STATE, 0x00);
-    // delay(1000);
+    switchState(OPERATIONAL_STATE, 0x00);
+    delay(1000);
 
     /* READ */
     // do {
@@ -176,8 +174,6 @@ void N5CANOpen :: startAutoCalibration() {
 }
 
 void N5CANOpen :: startPositionProfile() {
-
-    t_N5_RXPDO  rxpdo;
 
     SERIAL_PORT_MONITOR.println("Send frame 1");
     for(int i = 0; i < 8; i++) rxpdo.array[i] = 0;

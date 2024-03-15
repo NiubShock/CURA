@@ -78,7 +78,8 @@ class N5CANOpen {
                 uint16_t    r_6040;
                 uint8_t     r_6060;
                 uint16_t    r_6042;
-                uint8_t     empty[3];
+                uint16_t    r_6073;
+                uint8_t     unused;
             } b;
             uint8_t         array[8];
         } t_N5_RXPDO;
@@ -106,6 +107,8 @@ class N5CANOpen {
 
             } p;
         } t_N5_Payload;
+
+        t_N5_RXPDO  rxpdo;
 
         bool checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx);
         

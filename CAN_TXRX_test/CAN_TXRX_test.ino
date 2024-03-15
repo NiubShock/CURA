@@ -45,13 +45,13 @@ void setup() {
     para.max_current                    = 18000;
     para.max_duration_peak_current      = 1000;
     para.rated_current                  = 12000;
-    para.max_perth_current              = 100;
+    para.max_perth_current              = 1000;
 
   
     SERIAL_PORT_MONITOR.println(N5.setMotorData(para));
 
     N5.startAutoCalibration();
-    N5.startPositionProfile();
+    // N5.startPositionProfile();
 
 }
 
