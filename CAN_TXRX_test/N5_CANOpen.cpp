@@ -176,7 +176,7 @@ void N5CANOpen :: startAutoCalibration() {
 void N5CANOpen :: startPositionProfile() {
 
     SERIAL_PORT_MONITOR.println("Send frame 1");
-    for(int i = 0; i < 8; i++) rxpdo.array[i] = 0;
+
     rxpdo.b.r_6060 = 0x02;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 

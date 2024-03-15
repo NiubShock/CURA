@@ -132,6 +132,7 @@ void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_
 
 void N5CANOpen :: defPDOMapping() {
     uint16_t add_reg[]      = {0x6040, 0x6060, 0x6042, 0x6073};
+    // uint16_t add_reg[]      = {0x6040, 0x6060, 0x6071, 0x6073};
     uint8_t reg_subind[]    = {0x00, 0x00, 0x00, 0x00};
     uint8_t reg_size[]      = {0x10, 0x8, 0x10, 0x10};
 
