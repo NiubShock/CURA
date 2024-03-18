@@ -136,9 +136,9 @@ class N5CANOpen {
 
         void begin();
         bool setMotorData(t_Motor_Data para);
-        void startAutoCalibration();
+        bool startAutoCalibration();
         void setControlLoop();
-        void startVelocityProfile(uint16_t speed);
+        bool startVelocityProfile(uint16_t speed);
         void stopVelocityProfile();
 
         void printCANData(t_N5_Frame frame);
@@ -148,6 +148,7 @@ class N5CANOpen {
         void switchState(uint8_t state, uint8_t node_ID);
 
         uint16_t check6041Status(uint16_t status);
+        bool checkOBJbits(uint16_t index, uint16_t subindex, uint16_t bits, uint16_t timeout);
 };
 
 

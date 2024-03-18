@@ -178,3 +178,25 @@ uint16_t N5CANOpen :: check6041Status(uint16_t status) {
     }
 
 }
+
+bool N5CANOpen :: checkOBJbits(uint16_t index, uint16_t subindex, uint16_t bits, uint16_t timeout) {
+
+    N5CANOpen::t_N5_Frame  frame_rx;
+
+    uint16_t    local_timeout = timeout;
+    bool        ret_status = false;
+
+    while (local_timeout > 0) {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, index, subindex, 0x00, frame_rx.array);
+        delay(1);
+
+        local_timeout = local_timeout - 1;
+
+        if ((frame_rx.b.p.payload_32t & bits) == bits) {
+            local_timeout = 0;
+            ret_status = true;
+        }
+    }
+
+    return(ret_status);
+}
