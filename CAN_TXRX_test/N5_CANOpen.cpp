@@ -65,10 +65,6 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     return true;
 }
 
-void N5CANOpen :: setControlLoop() {
-
-}
-
 void N5CANOpen :: startAutoCalibration() {
     t_N5_TXPDO  txpdo;
     t_N5_Frame  frame_rx;
@@ -89,6 +85,7 @@ void N5CANOpen :: startAutoCalibration() {
     /* READ */
     // do {
     //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+    //     SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
     //     delay(10);
     // } while((frame_rx.b.p.payload_32t & 0x221) != 0x221);
 
@@ -105,35 +102,33 @@ void N5CANOpen :: startAutoCalibration() {
     rxpdo.b.r_6040 = 0x07;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
-    /* Set to operational state */
-    switchState(OPERATIONAL_STATE, 0x00);
-    delay(1000);
+    /* Set to operational state - USELESS*/
+    // switchState(OPERATIONAL_STATE, 0x00);
+    // delay(1000);
 
-    /* READ */
-    // do {
-    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-    //     // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
-    //     delay(10);
-    // } while((frame_rx.b.p.payload_32t & 0x233) != 0x233);
+    /* READ - OK */
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x233) != 0x233);
 
     SERIAL_PORT_MONITOR.println("Send frame 3");
     rxpdo.b.r_6040 = 0x0F;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
-    /* READ */
-    // do {
-    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-    //     // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t & 0x27, HEX);
-    //     delay(10);
-    // } while((frame_rx.b.p.payload_32t & 0x237) != 0x237);
+    /* READ - OK */
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x237) != 0x237);
 
-    SERIAL_PORT_MONITOR.println("Reading 2 ");
-    /* READ */
-    // do {
-    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6061, 0x00, 0x00, frame_rx.array);
-    //     delay(10);
-    // } while(frame_rx.b.p.payload_32t != 0xFE);
+    /* READ - OK */
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6061, 0x00, 0x00, frame_rx.array);
+        delay(10);
+    } while(frame_rx.b.p.payload_32t != 0xFE);
 
     SERIAL_PORT_MONITOR.println("Send frame 4");
     rxpdo.b.r_6040 = 0x1F;
@@ -143,7 +138,6 @@ void N5CANOpen :: startAutoCalibration() {
     /* READ */
     do {
         sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-        // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
         delay(10);
     } while((frame_rx.b.p.payload_32t & 0x1237) != 0x1237);
     
@@ -154,14 +148,14 @@ void N5CANOpen :: startAutoCalibration() {
 
 }
 
-void N5CANOpen :: startVelocityProfile() {
+void N5CANOpen :: startVelocityProfile(uint16_t speed) {
 
     SERIAL_PORT_MONITOR.println("Send frame 1");
 
     rxpdo.b.r_6060 = 0x02;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
-    rxpdo.b.r_6042 = 0xC8;
+    rxpdo.b.r_6042 = speed;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
     rxpdo.b.r_6040 = 0x06;
