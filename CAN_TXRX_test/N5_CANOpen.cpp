@@ -150,6 +150,8 @@ void N5CANOpen :: startAutoCalibration() {
 
 void N5CANOpen :: startVelocityProfile(uint16_t speed) {
 
+    t_N5_Frame  frame_rx;
+
     SERIAL_PORT_MONITOR.println("Send frame 1");
 
     rxpdo.b.r_6060 = 0x02;
@@ -160,15 +162,33 @@ void N5CANOpen :: startVelocityProfile(uint16_t speed) {
 
     rxpdo.b.r_6040 = 0x06;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
-    delay(100);
+    // delay(100);
+
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x221) != 0x221);
 
     rxpdo.b.r_6040 = 0x07;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
-    delay(100);
+    // delay(100);
+
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x233) != 0x233);
 
     rxpdo.b.r_6040 = 0x0F;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
-    delay(100);
+    // delay(100);
+
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        // SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x237) != 0x237);
 
 }
 
