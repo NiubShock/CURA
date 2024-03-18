@@ -138,7 +138,8 @@ class N5CANOpen {
         bool setMotorData(t_Motor_Data para);
         void startAutoCalibration();
         void setControlLoop();
-        void startPositionProfile();
+        void startVelocityProfile();
+        void stopVelocityProfile();
 
         void printCANData(t_N5_Frame frame);
         void printCANData(uint8_t *array);

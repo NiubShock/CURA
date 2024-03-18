@@ -20,25 +20,6 @@ void setup() {
 
     N5.begin();
 
-    // MCP2515::t_MCP2515_Init_Param   param;
-    // MCP2515::t_MCP2515_Mode         canctrl;
-
-    // canctrl.operating_mode      = MODE_NORMAL;
-    // canctrl.oneshot_mode        = true;
-
-
-    // /* 16 time quanta - prop + ps1 = 13 - Seg2 = 2 */
-    // param.synch                 = 0;
-    // param.prescaler             = 0;
-    // param.ps1                   = 2;
-    // param.ps2                   = 2;
-    // param.propagation_delay     = 0;
-    // param.triple_sample_point   = true;
-
-    // param.receive_buff_option   = MCP_RX_FLT_ANY;
-    // param.rollover_enable       = false;
-
-    // SERIAL_PORT_MONITOR.print(mcp2515.begin(param, canctrl));
     N5CANOpen :: t_Motor_Data para;
 
     para.pole_pair                      = 3;
@@ -51,33 +32,11 @@ void setup() {
     SERIAL_PORT_MONITOR.println(N5.setMotorData(para));
 
     N5.startAutoCalibration();
-    N5.startPositionProfile();
+    N5.startVelocityProfile();
 
 }
 
-// uint8_t data_rx[8];
-
 void loop() {
-
-    
-    // MCP2515::t_MCP2515_CAN_Frame frame;
-    // uint8_t data_arr[] = {0x40, 0x41, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-    // frame.ID = 0x601;
-    // frame.data_length = 8;
-    // frame.data = data_arr;
-    // mcp2515.transfer(frame);
-
-    // if(mcp2515.checkRXBuffer(data_rx, 100)){
-    //     for (int i = 0; i < 8; i++){
-    //         SERIAL_PORT_MONITOR.print(data_rx[i], HEX);
-    //         SERIAL_PORT_MONITOR.print(" ");
-    //     }
-    //     SERIAL_PORT_MONITOR.println(" ");
-    // }
-
-    delay(1000);
-    // SERIAL_PORT_MONITOR.println("cycle");
 
 }
 
