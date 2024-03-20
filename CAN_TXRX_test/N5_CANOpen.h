@@ -77,10 +77,11 @@ class N5CANOpen {
             struct {
                 uint16_t    r_6040;
                 uint8_t     r_6060;
-                uint16_t    r_6042;
+                uint16_t    r_6042_6071;
                 uint16_t    r_6073;
+                uint32_t    r_3202;
             } b;
-            uint8_t         array[7];
+            uint8_t         array[11];
         } t_N5_RXPDO;
 
         typedef union {
@@ -116,7 +117,6 @@ class N5CANOpen {
         
         void setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_t *ptr_reg_size, uint8_t size);
         uint8_t loadDownloadSize(uint8_t size);
-        void defPDOMapping();
 
     public:
 
@@ -134,11 +134,15 @@ class N5CANOpen {
         } t_Control_Para;
 
         void begin();
+        void PDOMapping_Velocity();
+        void PDOMapping_Torque();
         bool setMotorData(t_Motor_Data para);
         bool startAutoCalibration();
         void setControlLoop();
         bool startVelocityProfile(uint16_t speed);
         void stopVelocityProfile();
+
+        bool startTorqueProfile(uint16_t torque);
 
         void printCANData(t_N5_Frame frame);
         void printCANData(uint8_t *array);

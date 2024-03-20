@@ -29,9 +29,6 @@ void N5CANOpen :: begin(){
     /* Set to preoperational state */
     switchState(PREOP_STATE, 0x00);
     delay(1000);
-
-    /* Write the PDO mapping for the RX - 6040:00, 6060:00, 6042:00 */
-    defPDOMapping();
 }
 
 bool N5CANOpen :: setMotorData(t_Motor_Data para) {
@@ -88,10 +85,6 @@ bool N5CANOpen :: startAutoCalibration() {
         delay(10);
     } while((frame_rx.b.p.payload_32t & 0x221) != 0x221);
 
-    /* Set to operational state */
-    switchState(OPERATIONAL_STATE, 0x00);
-    delay(1000);
-
     rxpdo.b.r_6060 = 0xFE;
     sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
@@ -132,10 +125,44 @@ bool N5CANOpen :: startVelocityProfile(uint16_t speed) {
 
     SERIAL_PORT_MONITOR.println("Starting control loop");
 
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x3202, 0x00, 0x00, frame_rx.array);
+
     rxpdo.b.r_6060 = 0x02;
+    rxpdo.b.r_3202 = frame_rx.b.p.payload_32t | 0x80;
     sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
-    rxpdo.b.r_6042 = speed;
+    rxpdo.b.r_6042_6071 = speed;
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
+
+    rxpdo.b.r_6040 = 0x06;
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
+    ret = checkOBJbits(0x6041, 0x00, 0x221, 1000);
+    if (ret == false) return false;
+
+    rxpdo.b.r_6040 = 0x07;
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
+    ret = checkOBJbits(0x6041, 0x00, 0x233, 1000);
+    if (ret == false) return false;
+
+    rxpdo.b.r_6040 = 0x0F;
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
+    ret = checkOBJbits(0x6041, 0x00, 0x237, 1000);
+    if (ret == false) return false;
+
+    return true;
+}
+
+bool N5CANOpen :: startTorqueProfile(uint16_t torque) {
+
+    t_N5_Frame  frame_rx;
+    bool ret = false;
+
+    SERIAL_PORT_MONITOR.println("Starting control loop");
+
+    rxpdo.b.r_6060 = 0x04;
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
+
+    rxpdo.b.r_6042_6071 = torque;
     sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     rxpdo.b.r_6040 = 0x06;

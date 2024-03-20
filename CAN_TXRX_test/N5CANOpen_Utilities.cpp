@@ -127,10 +127,18 @@ void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_
     printCANData(frame_rx);
 }
 
-void N5CANOpen :: defPDOMapping() {
-    uint16_t add_reg[]      = {0x6040, 0x6060, 0x6042, 0x6073};
-    uint8_t reg_subind[]    = {0x00, 0x00, 0x00, 0x00};
-    uint8_t reg_size[]      = {0x10, 0x8, 0x10, 0x10};
+void N5CANOpen :: PDOMapping_Velocity() {
+    uint16_t add_reg[]      = {0x6040, 0x6060, 0x6042, 0x6073, 0x3202};
+    uint8_t reg_subind[]    = {0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t reg_size[]      = {0x10, 0x8, 0x10, 0x10, 0x20};
+
+    setRXPDO(add_reg, reg_subind, reg_size, 4);
+}
+
+void N5CANOpen :: PDOMapping_Torque() {
+    uint16_t add_reg[]      = {0x6040, 0x6060, 0x6071, 0x6073, 0x3202};
+    uint8_t reg_subind[]    = {0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t reg_size[]      = {0x10, 0x8, 0x10, 0x10, 0x20};
 
     setRXPDO(add_reg, reg_subind, reg_size, 4);
 }

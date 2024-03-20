@@ -20,6 +20,9 @@ void setup() {
 
     N5.begin();
 
+    N5.PDOMapping_Velocity();
+    // N5.PDOMapping_Torque();
+
     N5CANOpen :: t_Motor_Data para;
 
     para.pole_pair                      = 3;
@@ -33,6 +36,7 @@ void setup() {
 
     N5.startAutoCalibration();
     N5.startVelocityProfile(0xC8);
+    // N5.startTorqueProfile(100);
 
 }
 
