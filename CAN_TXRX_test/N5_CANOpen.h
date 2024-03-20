@@ -79,9 +79,8 @@ class N5CANOpen {
                 uint8_t     r_6060;
                 uint16_t    r_6042;
                 uint16_t    r_6073;
-                uint8_t     unused;
             } b;
-            uint8_t         array[8];
+            uint8_t         array[7];
         } t_N5_RXPDO;
 
         typedef union {

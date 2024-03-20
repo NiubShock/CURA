@@ -82,7 +82,7 @@ bool N5CANOpen :: startAutoCalibration() {
 
     // SERIAL_PORT_MONITOR.println("Send frame 1");
     rxpdo.b.r_6040 = 0x06;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     /* READ */
     // do {
@@ -98,18 +98,17 @@ bool N5CANOpen :: startAutoCalibration() {
     delay(1000);
 
     rxpdo.b.r_6060 = 0xFE;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     delay(100);
     rxpdo.b.r_6040 = 0x07;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     ret = checkOBJbits(0x6041, 0x00, 0x233, 1000);
     if (ret == false) return false;
 
-    // SERIAL_PORT_MONITOR.println("Send frame 3");
     rxpdo.b.r_6040 = 0x0F;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
     ret = checkOBJbits(0x6041, 0x00, 0x237, 1000);
@@ -118,17 +117,15 @@ bool N5CANOpen :: startAutoCalibration() {
     ret = checkOBJbits(0x6061, 0x00, 0xFE, 1000);
     if (ret == false) return false;
 
-    // SERIAL_PORT_MONITOR.println("Send frame 4");
     rxpdo.b.r_6040 = 0x1F;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
     ret = checkOBJbits(0x6041, 0x00, 0x1237, 1000);
     if (ret == false) return false;
     
-    // SERIAL_PORT_MONITOR.println("Send frame 5");
     rxpdo.b.r_6040 = 0x00;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
 }
@@ -141,23 +138,23 @@ bool N5CANOpen :: startVelocityProfile(uint16_t speed) {
     SERIAL_PORT_MONITOR.println("Starting control loop");
 
     rxpdo.b.r_6060 = 0x02;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     rxpdo.b.r_6042 = speed;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     rxpdo.b.r_6040 = 0x06;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     ret = checkOBJbits(0x6041, 0x00, 0x221, 1000);
     if (ret == false) return false;
 
     rxpdo.b.r_6040 = 0x07;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     ret = checkOBJbits(0x6041, 0x00, 0x233, 1000);
     if (ret == false) return false;
 
     rxpdo.b.r_6040 = 0x0F;
-    sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     ret = checkOBJbits(0x6041, 0x00, 0x237, 1000);
     if (ret == false) return false;
 
