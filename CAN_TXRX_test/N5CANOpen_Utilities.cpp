@@ -21,8 +21,6 @@ void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t co
     /* Send the data and wait for the answer */
     mcp2515.transfer(&frame_mcp);
     if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_answ, 100);
-
-    // for (int i = 0; i < 8; i++) frame_answ ->array[i] = *(frame_mcp_rx.data + i);
 }
 
 void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t *ptr_data, uint8_t *frame_answ) {
@@ -68,7 +66,6 @@ uint8_t N5CANOpen :: loadDownloadSize(uint8_t size) {
     return 0;
 }
 
-//0xC0A89602
 void N5CANOpen :: setIP(uint32_t IP) {
     t_N5_Frame frame_rx;
 
@@ -132,7 +129,6 @@ void N5CANOpen :: setRXPDO(uint16_t *ptr_register, uint8_t *ptr_subindex, uint8_
 
 void N5CANOpen :: defPDOMapping() {
     uint16_t add_reg[]      = {0x6040, 0x6060, 0x6042, 0x6073};
-    // uint16_t add_reg[]      = {0x6040, 0x6060, 0x6071, 0x6073};
     uint8_t reg_subind[]    = {0x00, 0x00, 0x00, 0x00};
     uint8_t reg_size[]      = {0x10, 0x8, 0x10, 0x10};
 

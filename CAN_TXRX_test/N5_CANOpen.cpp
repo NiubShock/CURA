@@ -39,8 +39,6 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     t_N5_Frame frame_rx;
     MCP2515::t_MCP2515_CAN_Frame frame_mcp;
 
-    // mcp2515.checkRXBuffer(frame_rx.array, 100);
-
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2030, 0x00, para.pole_pair, frame_rx.array);
     printCANData(frame_rx);
 
@@ -80,18 +78,15 @@ bool N5CANOpen :: startAutoCalibration() {
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2300, 0x00, 0x00, frame_rx.array);
     printCANData(frame_rx);
 
-    // SERIAL_PORT_MONITOR.println("Send frame 1");
     rxpdo.b.r_6040 = 0x06;
     sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
 
     /* READ */
-    // do {
-    //     sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
-    //     SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
-    //     delay(10);
-    // } while((frame_rx.b.p.payload_32t & 0x221) != 0x221);
-
-    // SERIAL_PORT_MONITOR.println("Send frame 2");
+    do {
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6041, 0x00, 0x00, frame_rx.array);
+        SERIAL_PORT_MONITOR.println(frame_rx.b.p.payload_32t, HEX);
+        delay(10);
+    } while((frame_rx.b.p.payload_32t & 0x221) != 0x221);
 
     /* Set to operational state */
     switchState(OPERATIONAL_STATE, 0x00);
