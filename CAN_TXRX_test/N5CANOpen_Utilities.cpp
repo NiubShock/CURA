@@ -218,3 +218,19 @@ bool N5CANOpen :: checkOBJbits(uint16_t index, uint16_t subindex, uint16_t bits,
 
     return(ret_status);
 }
+
+void N5CANOpen :: preopNode() {
+    /* Go in operational state to enable PDO - Used for obj 6073:00*/
+    switchState(PREOP_STATE, 0x00);
+    delay(1000);
+}
+
+void N5CANOpen :: closeLoop() {
+    N5CANOpen::t_N5_Frame  frame_rx;
+
+    switchState(PREOP_STATE, 0x00);
+    delay(1000);
+
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x41, frame_rx.array);
+    printCANData(frame_rx);
+}

@@ -154,6 +154,9 @@ class N5CANOpen {
 
         uint16_t check6041Status(uint16_t status);
         bool checkOBJbits(uint16_t index, uint16_t subindex, uint16_t bits, uint16_t timeout);
+
+        void preopNode();
+        void closeLoop();
 };
 
 
