@@ -116,6 +116,8 @@ bool N5CANOpen :: startAutoCalibration() {
     sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     printCANData(frame_rx);
 
+    /* Save the configuration */
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x1010, 0x01, 0x65766173, frame_rx.array);
 }
 
 bool N5CANOpen :: startVelocityProfile(uint16_t speed) {
@@ -123,9 +125,14 @@ bool N5CANOpen :: startVelocityProfile(uint16_t speed) {
     t_N5_Frame  frame_rx;
     bool ret = false;
 
-    SERIAL_PORT_MONITOR.println("Starting control loop");
+    PDO_Close_Loop();
+    PDOMapping_Velocity();
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x3202, 0x00, 0x00, frame_rx.array);
+    /* Set to operational state */
+    switchState(OPERATIONAL_STATE, 0x00);
+    delay(1000);
+
+    SERIAL_PORT_MONITOR.println("Starting control loop");
 
     rxpdo.b.r_6060 = 0x02;
     rxpdo.b.r_3202 = frame_rx.b.p.payload_32t | 0x80;
@@ -148,6 +155,13 @@ bool N5CANOpen :: startVelocityProfile(uint16_t speed) {
     sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
     ret = checkOBJbits(0x6041, 0x00, 0x237, 1000);
     if (ret == false) return false;
+
+    while(1){
+        sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x3202, 0x00, 0x00, frame_rx.array);
+    printCANData(frame_rx);
+
+    }    
+    
 
     return true;
 }

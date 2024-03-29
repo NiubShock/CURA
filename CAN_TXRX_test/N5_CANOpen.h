@@ -142,6 +142,8 @@ class N5CANOpen {
         bool startVelocityProfile(uint16_t speed);
         void stopVelocityProfile();
 
+        void PDO_Close_Loop();
+
         bool startTorqueProfile(uint16_t torque);
 
         void printCANData(t_N5_Frame frame);

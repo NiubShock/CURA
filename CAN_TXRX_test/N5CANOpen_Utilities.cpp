@@ -135,6 +135,19 @@ void N5CANOpen :: PDOMapping_Velocity() {
     setRXPDO(add_reg, reg_subind, reg_size, 4);
 }
 
+void N5CANOpen :: PDO_Close_Loop() {
+    uint16_t add_reg[]      = {0x3202};
+    uint8_t reg_subind[]    = {0x00};
+    uint8_t reg_size[]      = {0x20};
+
+    uint8_t arr[8];
+    arr[0] = 0x41;
+
+    setRXPDO(add_reg, reg_subind, reg_size, 1);
+
+    sendFrameWAnswer(0x201, 4, arr, nullptr);
+}
+
 void N5CANOpen :: PDOMapping_Torque() {
     uint16_t add_reg[]      = {0x6040, 0x6060, 0x6071, 0x6073, 0x3202};
     uint8_t reg_subind[]    = {0x00, 0x00, 0x00, 0x00, 0x00};
