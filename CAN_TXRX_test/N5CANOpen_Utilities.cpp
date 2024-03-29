@@ -140,7 +140,8 @@ void N5CANOpen :: PDO_Close_Loop() {
     uint8_t reg_subind[]    = {0x00};
     uint8_t reg_size[]      = {0x20};
 
-    uint8_t arr[8];
+    uint8_t arr[4];
+    for(int i = 0; i < 4; i++) arr[i] = 0;
     arr[0] = 0x41;
 
     setRXPDO(add_reg, reg_subind, reg_size, 1);

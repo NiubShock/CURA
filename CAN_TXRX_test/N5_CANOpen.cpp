@@ -36,6 +36,12 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     t_N5_Frame frame_rx;
     MCP2515::t_MCP2515_CAN_Frame frame_mcp;
 
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x41, frame_rx.array);
+    printCANData(frame_rx);
+
+    switchState(OPERATIONAL_STATE, 0x00);
+    delay(1000);
+
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2030, 0x00, para.pole_pair, frame_rx.array);
     printCANData(frame_rx);
 
@@ -51,7 +57,7 @@ bool N5CANOpen :: setMotorData(t_Motor_Data para) {
     rxpdo.b.r_6073 = para.max_perth_current;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 
-    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x40, frame_rx.array);
+    sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x41, frame_rx.array);
     printCANData(frame_rx);
 
     sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x2059, 0x00, 0x00, frame_rx.array);
@@ -125,7 +131,9 @@ bool N5CANOpen :: startVelocityProfile(uint16_t speed) {
     t_N5_Frame  frame_rx;
     bool ret = false;
 
-    PDO_Close_Loop();
+    // sendFrameWAnswer(0x601, 8, N5_SDO_DOWN_CMD_4B, 0x3202, 0x00, 0x41, frame_rx.array);
+    // printCANData(frame_rx);
+    // PDO_Close_Loop();
     PDOMapping_Velocity();
 
     /* Set to operational state */
