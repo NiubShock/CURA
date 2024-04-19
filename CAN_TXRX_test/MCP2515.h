@@ -40,10 +40,13 @@ class MCP2515 {
         void end();
         bool transfer(t_MCP2515_CAN_Frame *frame);
         bool checkRXBuffer(uint8_t *ptr_array);
-        bool checkRXBuffer(uint8_t *ptr_array, uint16_t delay_ms);
+        bool checkRXBuffer(uint16_t ID, uint8_t *ptr_array, uint16_t delay_ms);
+        bool checkRXBuffer1(uint16_t ID, uint8_t *ptr_array, uint16_t delay_ms);
 
         bool write_register(uint8_t addressv, uint8_t data);
         uint16_t read_register(uint8_t address);
+
+
 
     private:
 

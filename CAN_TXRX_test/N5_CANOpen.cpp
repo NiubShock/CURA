@@ -223,3 +223,102 @@ void N5CANOpen :: stopVelocityProfile() {
     rxpdo.b.r_6040 = 0x06;
     sendFrameWAnswer(0x201, 8, rxpdo.array, nullptr);
 }
+
+void N5CANOpen :: setSpeedSetpoint(uint16_t speed){
+    rxpdo.b.r_6042_6071 = speed;
+    sendFrameWAnswer(0x201, 7, rxpdo.array, nullptr);
+}
+
+
+uint16_t N5CANOpen :: readSpeed(){ 
+    t_N5_Frame  frame_rx;
+    uint8_t ptr[8];
+
+
+    /* Load brushless motor configuration */
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6044, 0x00, 0x40, frame_rx.array);
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6044, 0x00, 0x40, frame_rx.array);
+    // SERIAL_PORT_MONITOR.print(frame_rx.b.i.index);
+    // SERIAL_PORT_MONITOR.println(" with 0x6044");
+    // printCANData(frame_rx.array);
+
+    if (frame_rx.b.i.index == 0x6044) {
+        return frame_rx.b.p.payload_32t;
+    }else {
+        return 0xFFFF;
+    }
+}
+
+
+uint16_t N5CANOpen :: readTorque(){ 
+    t_N5_Frame  frame_rx;
+
+    /* Load brushless motor configuration */
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6077, 0x00, 0x40, frame_rx.array);
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6077, 0x00, 0x40, frame_rx.array);
+    // SERIAL_PORT_MONITOR.println(frame_rx.b.i.index);
+
+    if (frame_rx.b.i.index == 0x6077) {
+        return frame_rx.b.p.payload_32t;
+    }else {
+        return 0xFFFF;
+    }
+
+    // printCANData(frame_rx.array);
+}
+
+
+uint16_t N5CANOpen :: readPosition(){
+    t_N5_Frame  frame_rx;
+
+    /* Load brushless motor configuration */
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6064, 0x00, 0x40, frame_rx.array);
+    sendFrameWAnswer(0x601, 8, N5_SDO_UP_REQ, 0x6064, 0x00, 0x40, frame_rx.array);
+    // SERIAL_PORT_MONITOR.println(frame_rx.b.i.index);
+
+    if (frame_rx.b.i.index == 0x6064) {
+        return frame_rx.b.p.payload_32t;
+    }else {
+        return 0xFFFF;
+    }
+}
+
+
+void N5CANOpen :: readData(t_Data_Read *ptr_data){
+    t_N5_Frame  frame_rx;
+    uint16_t    reading_array[3] = {0x6044, 0x6064, 0x6077};
+    uint8_t     size = sizeof(reading_array)/sizeof(uint16_t);
+    static uint8_t actual_read = 0;
+
+    sendFrame(0x601, 8, N5_SDO_UP_REQ, reading_array[actual_read], 0x00, 0x40, frame_rx.array);
+    readCAN(frame_rx.array);
+    actual_read = actual_read + 1;
+
+    
+    if (actual_read >= size) actual_read = 0;
+
+    switch(frame_rx.b.i.index) {
+        /* Speed */
+        case 0x6044:
+        if (frame_rx.b.command == N5_SDO_UP_CMD_2B)
+            ptr_data ->speed = frame_rx.b.p.payload_32t;
+        break;
+
+        /* Torque */
+        case 0x6077:
+        if (frame_rx.b.command == N5_SDO_UP_CMD_2B)
+            ptr_data ->torque = frame_rx.b.p.payload_32t;
+        break;
+
+        /* Position */
+        case 0x6064:
+        if (frame_rx.b.command == N5_SDO_UP_CMD_4B)
+            ptr_data ->position = frame_rx.b.p.payload_32t;
+        break;
+
+        default:
+        break;
+    }
+
+    // printCANData(frame_rx.array);
+}

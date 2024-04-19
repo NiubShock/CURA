@@ -108,16 +108,31 @@ bool MCP2515 :: checkRXBuffer(uint8_t *ptr_array){
     return((bool)CANINTF.b.RX0IF);
 }
 
-bool MCP2515 :: checkRXBuffer(uint8_t *ptr_array, uint16_t delay_ms){
+bool MCP2515 :: checkRXBuffer(uint16_t ID, uint8_t *ptr_array, uint16_t delay_ms){
     bool read = false;
 
     /* wait for the cycle or just the read boolean becomes true */
     for (uint16_t i = 0; i < delay_ms && !read; i++){
         read = MCP2515 :: checkRXBuffer(ptr_array);
+        // CAN.sendMsgBuf(frame ->ID, 0, frame ->data_length, frame ->data);
+        // CAN.readMsgBufID(ID, 8, ptr_array);
         delay(1);
     }
 
     return read;
+}
+
+bool MCP2515 :: checkRXBuffer1(uint16_t ID, uint8_t *ptr_array, uint16_t delay_ms){
+    uint8_t size = 8;
+    //  uint8_t ptr_array[8];
+    /* wait for the cycle or just the read boolean becomes true */
+    // for (uint16_t i = 0; i < 10; i++){
+        // CAN.sendMsgBuf(frame ->ID, 0, frame ->data_length, frame ->data);
+        CAN.readMsgBuf(&size, ptr_array);
+        // delay(1);
+    // }
+
+    // N5CANOpen :: printCANData(ptr_array);
 }
 
 bool MCP2515 :: begin(uint8_t speed) {

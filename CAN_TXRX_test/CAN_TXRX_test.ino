@@ -33,12 +33,49 @@ void setup() {
 
     N5.preopNode();
     N5.closeLoop();
-    N5.startVelocityProfile(0xC8);
+    N5.startVelocityProfile(0x14);
 
 }
 
 void loop() {
 
+    static uint8_t counter = 0;
+
+    static N5CANOpen :: t_Data_Read data_read;
+
+    // if (counter < 10) {
+        // N5.setSpeedSetpoint(0x28);
+    // }
+    // else if (counter < 20){
+    //     N5.setSpeedSetpoint(0x28);
+    // } else {
+    //     counter = 0;
+    // }
+
+    // delay(1000);
+
+    delay(10);
+    counter++;
+    N5.readData(&data_read);
+
+    if(counter >= 10){
+        counter = 0;
+
+        SERIAL_PORT_MONITOR.print("Speed ");
+        SERIAL_PORT_MONITOR.print(data_read.speed);
+        SERIAL_PORT_MONITOR.print(" Torque ");
+        SERIAL_PORT_MONITOR.print(data_read.torque);
+        SERIAL_PORT_MONITOR.print(" Position ");
+        SERIAL_PORT_MONITOR.println(data_read.position);
+    }
+
+    // counter++;
+    // SERIAL_PORT_MONITOR.print("Speed ");
+    // SERIAL_PORT_MONITOR.print(N5.readSpeed());
+    // SERIAL_PORT_MONITOR.print(" Torque ");
+    // SERIAL_PORT_MONITOR.print(N5.readTorque());
+    // SERIAL_PORT_MONITOR.print(" Position ");
+    // SERIAL_PORT_MONITOR.println(N5.readPosition());
 }
 
 // END FILE

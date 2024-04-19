@@ -1,6 +1,44 @@
 #include "N5_CANOpen.h"
 #include "MCP2515.h"
 
+void N5CANOpen :: sendFrame(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, uint8_t *frame_answ){
+    t_N5_Frame frame;
+    MCP2515::t_MCP2515_CAN_Frame frame_mcp;
+    MCP2515::t_MCP2515_CAN_Frame frame_mcp_rx;
+
+    frame.b.command         = command;
+    frame.b.i.index         = index;
+    frame.b.subindex        = subindex;
+    frame.b.p.payload_32t   = payload;
+
+    /* Load the data in the MCP frame */
+    frame_mcp.ID            = ID; 
+    frame_mcp.data_length   = data_length;
+    frame_mcp.data          = frame.array;
+
+    frame_mcp.data          = frame.array;
+
+    /* Send the data and wait for the answer */
+    mcp2515.transfer(&frame_mcp);
+}
+
+void N5CANOpen :: readCAN(uint8_t *ptr_array){
+    // uint8_t ptr_array[8];
+    // /* wait for the cycle or just the read boolean becomes true */
+    // // for (uint16_t i = 0; i < 10; i++){
+    //     // CAN.sendMsgBuf(frame ->ID, 0, frame ->data_length, frame ->data);
+    //     CAN.readMsgBufID(0x601, 8, ptr_array);
+    //     // delay(1);
+    // // }
+
+    // printCANData(ptr_array);
+
+    // return read;
+
+    mcp2515.checkRXBuffer1(0x601, ptr_array, 100);
+    // printCANData(ptr_array);
+}
+
 void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, uint8_t *frame_answ){
     t_N5_Frame frame;
     MCP2515::t_MCP2515_CAN_Frame frame_mcp;
@@ -20,7 +58,7 @@ void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t co
 
     /* Send the data and wait for the answer */
     mcp2515.transfer(&frame_mcp);
-    if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_answ, 100);
+    if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_mcp.ID, frame_answ, 100);
 }
 
 void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t *ptr_data, uint8_t *frame_answ) {
@@ -33,7 +71,7 @@ void N5CANOpen :: sendFrameWAnswer(uint16_t ID, uint16_t data_length, uint8_t *p
     frame_mcp.data          = ptr_data;
 
     mcp2515.transfer(&frame_mcp);
-    if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_answ, 100);
+    if (frame_answ != nullptr)  mcp2515.checkRXBuffer(frame_mcp.ID, frame_answ, 100);
 }
 
 bool N5CANOpen :: checkTXAnswer(t_N5_Frame frame_tx, t_N5_Frame frame_rx) {

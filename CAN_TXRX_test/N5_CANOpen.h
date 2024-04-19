@@ -133,6 +133,12 @@ class N5CANOpen {
             uint32_t        max_current;
         } t_Control_Para;
 
+        typedef struct {
+            int16_t        speed;
+            int16_t        torque;
+            uint16_t        position;
+        } t_Data_Read;
+
         void begin();
         void PDOMapping_Velocity();
         void PDOMapping_Torque();
@@ -154,6 +160,15 @@ class N5CANOpen {
 
         uint16_t check6041Status(uint16_t status);
         bool checkOBJbits(uint16_t index, uint16_t subindex, uint16_t bits, uint16_t timeout);
+
+        void setSpeedSetpoint(uint16_t speed);
+        uint16_t readSpeed();
+        uint16_t readTorque();
+        uint16_t readPosition();
+        void readData(t_Data_Read *ptr_data);
+
+        void sendFrame(uint16_t ID, uint16_t data_length, uint8_t command, uint16_t index, uint8_t subindex, uint32_t payload, uint8_t *frame_answ);
+        void readCAN(uint8_t *ptr_array);
 
         void preopNode();
         void closeLoop();
