@@ -20,7 +20,7 @@ void setup() {
 
     N5CANOpen :: t_Motor_Data para;
     para.pole_pair                      = 3;
-    para.max_current                    = 18000;
+    para.max_current                    = 9000;
     para.max_duration_peak_current      = 1000;
     para.rated_current                  = 12000;
     para.max_perth_current              = 100;
